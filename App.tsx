@@ -389,7 +389,7 @@ const App: React.FC = () => {
         return (
           <div className="animate-in fade-in duration-1000">
             {/* Hero Section */}
-            <section className="relative min-h-screen flex items-center overflow-hidden">
+            <section className="relative min-h-screen flex flex-col justify-center overflow-hidden py-20">
               {/* Background Sea Image */}
               <div className="absolute inset-0 z-0">
                 <img 
@@ -401,42 +401,42 @@ const App: React.FC = () => {
                 <div className="absolute inset-0 bg-black/20"></div>
               </div>
 
-              <div className="max-w-7xl mx-auto px-6 sm:px-12 w-full relative z-10">
-                <div className="max-w-2xl backdrop-blur-2xl bg-white/10 border border-white/20 p-12 sm:p-16 rounded-[32px] shadow-2xl animate-in slide-in-from-left-8 duration-1000">
-                  <div className="display text-[10px] font-bold uppercase tracking-[0.4em] text-white/70 mb-8 flex items-center space-x-4">
-                    <span className="w-12 h-[1px] bg-white/40"></span>
+              <div className="max-w-7xl mx-auto px-4 sm:px-12 w-full relative z-10 flex justify-center lg:justify-start pt-16 sm:pt-24">
+                <div className="max-w-2xl w-full backdrop-blur-2xl bg-white/10 border border-white/20 p-8 sm:p-14 rounded-[24px] sm:rounded-[32px] shadow-2xl animate-in slide-in-from-left-8 duration-1000">
+                  <div className="display text-[8px] sm:text-[10px] font-bold uppercase tracking-[0.4em] text-white/70 mb-6 sm:mb-8 flex items-center space-x-4">
+                    <span className="w-8 sm:w-12 h-[1px] bg-white/40"></span>
                     <span>Premium Hydration</span>
                   </div>
-                  <h1 className="display text-6xl sm:text-8xl font-bold text-white leading-[0.9] tracking-tighter uppercase mb-12">
+                  <h1 className="display text-4xl sm:text-8xl font-bold text-white leading-[0.9] tracking-tighter uppercase mb-8 sm:mb-12">
                     Purity <br/>
                     <span className="serif italic font-light lowercase tracking-normal text-white/50">Redefined.</span>
                   </h1>
-                  <p className="serif text-2xl text-white/80 mb-12 leading-relaxed italic">
+                  <p className="serif text-lg sm:text-2xl text-white/80 mb-8 sm:mb-12 leading-relaxed italic">
                     Chennai's most sophisticated water delivery service, combining advanced purification with an editorial approach to living.
                   </p>
-                  <div className="flex items-center space-x-12">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-8 sm:space-y-0 sm:space-x-12">
                     <button 
                       onClick={() => {
                         const el = document.getElementById('selections');
                         el?.scrollIntoView({ behavior: 'smooth' });
                       }}
-                      className="display text-[11px] font-bold uppercase tracking-[0.3em] text-white border-b-2 border-white pb-2 hover:text-blue-300 hover:border-blue-300 transition-all"
+                      className="display text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.3em] text-white border-b-2 border-white pb-2 hover:text-blue-300 hover:border-blue-300 transition-all"
                     >
                       Explore Collection
                     </button>
                     <div className="flex flex-col">
-                       <span className="display text-[10px] font-bold uppercase tracking-[0.2em] text-white/40">Purification</span>
-                       <span className="display text-sm font-bold uppercase text-white">04 Stages</span>
+                       <span className="display text-[8px] sm:text-[10px] font-bold uppercase tracking-[0.2em] text-white/40">Purification</span>
+                       <span className="display text-xs sm:text-sm font-bold uppercase text-white">04 Stages</span>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Floating Badge */}
-              <div className="absolute bottom-12 right-12 z-10 hidden lg:block">
-                <div className="backdrop-blur-xl bg-white/10 border border-white/20 p-8 rounded-2xl">
-                   <span className="display text-6xl font-bold text-white leading-none">12</span>
-                   <p className="display text-[10px] font-bold uppercase tracking-[0.2em] mt-4 text-white/60">Years of <br/> Excellence</p>
+              <div className="absolute bottom-8 right-8 sm:bottom-16 sm:right-16 z-10 hidden sm:block">
+                <div className="backdrop-blur-xl bg-white/10 border border-white/20 p-6 sm:p-10 rounded-2xl sm:rounded-3xl">
+                   <span className="display text-4xl sm:text-6xl font-bold text-white leading-none">12</span>
+                   <p className="display text-[8px] sm:text-[10px] font-bold uppercase tracking-[0.2em] mt-2 sm:mt-4 text-white/60">Years of <br/> Excellence</p>
                 </div>
               </div>
             </section>
@@ -709,7 +709,7 @@ const App: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 selection:bg-blue-100 selection:text-blue-900">
       {isAppLoading && <LoadingScreen />}
-      {showHeaderFooter && <Header setView={setCurrentView} currentUser={currentUser} onLogout={handleLogout} />}
+      {showHeaderFooter && <Header setView={setCurrentView} currentUser={currentUser} onLogout={handleLogout} isTransparent={currentView === 'HOME'} />}
       <main className="flex-grow">{renderContent()}</main>
       {showHeaderFooter && <Footer setView={setCurrentView} />}
     </div>
