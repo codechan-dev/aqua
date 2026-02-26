@@ -39,37 +39,41 @@ const App: React.FC = () => {
 
     // Initial session check
     const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) {
-        // Fetch profile from profiles table
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', session.user.id)
-          .single();
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+          // Fetch profile from profiles table
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', session.user.id)
+            .single();
 
-        if (profile) {
-          const user: User = {
-            id: profile.id,
-            email: profile.email,
-            username: profile.username || '',
-            name: profile.name || '',
-            role: profile.role || 'user',
-          };
-          setCurrentUser(user);
-          if (user.role === 'admin') setCurrentView('ADMIN_PANEL');
-        } else {
-          // Fallback to metadata if profile not found (shouldn't happen with trigger)
-          const user: User = {
-            id: session.user.id,
-            email: session.user.email || '',
-            username: session.user.user_metadata.username || '',
-            name: session.user.user_metadata.name || '',
-            role: session.user.user_metadata.role || 'user',
-          };
-          setCurrentUser(user);
-          if (user.role === 'admin') setCurrentView('ADMIN_PANEL');
+          if (profile) {
+            const user: User = {
+              id: profile.id,
+              email: profile.email,
+              username: profile.username || '',
+              name: profile.name || '',
+              role: profile.role || 'user',
+            };
+            setCurrentUser(user);
+            if (user.role === 'admin') setCurrentView('ADMIN_PANEL');
+          } else {
+            // Fallback to metadata if profile not found (shouldn't happen with trigger)
+            const user: User = {
+              id: session.user.id,
+              email: session.user.email || '',
+              username: session.user.user_metadata.username || '',
+              name: session.user.user_metadata.name || '',
+              role: session.user.user_metadata.role || 'user',
+            };
+            setCurrentUser(user);
+            if (user.role === 'admin') setCurrentView('ADMIN_PANEL');
+          }
         }
+      } catch (e) {
+        console.error('Session check failed:', e);
       }
     };
 
@@ -115,52 +119,65 @@ const App: React.FC = () => {
   }, [currentUser, currentView]);
 
   const fetchOrders = async () => {
-    let query = supabase.from('orders').select('*');
-    
-    if (currentUser?.role !== 'admin') {
-      query = query.eq('userId', currentUser?.id);
-    }
+    try {
+      let query = supabase.from('orders').select('*');
+      
+      if (currentUser?.role !== 'admin') {
+        query = query.eq('userId', currentUser?.id);
+      }
 
-    const { data, error } = await query.order('createdAt', { ascending: false });
-    
-    if (error) {
-      console.error('Error fetching orders:', error.message);
-      return;
-    }
-    
-    if (data) {
-      setAllOrders(data as OrderData[]);
+      const { data, error } = await query.order('createdAt', { ascending: false });
+      
+      if (error) {
+        console.error('Error fetching orders:', error.message);
+        return;
+      }
+      
+      if (data) {
+        setAllOrders(data as OrderData[]);
+      }
+    } catch (e) {
+      console.error('Failed to fetch orders:', e);
     }
   };
 
   const fetchUsers = async () => {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .order('created_at', { ascending: false });
-    
-    if (error) {
-      console.error('Error fetching users:', error.message);
-      return;
-    }
-    
-    if (data) {
-      setAllUsers(data as User[]);
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (error) {
+        console.error('Error fetching users:', error.message);
+        return;
+      }
+      
+      if (data) {
+        setAllUsers(data as User[]);
+      }
+    } catch (e) {
+      console.error('Failed to fetch users:', e);
     }
   };
 
   const fetchProducts = async () => {
-    const { data, error } = await supabase.from('products').select('*');
-    if (error) {
-      console.error('Error fetching products:', error.message);
-      setProducts(PRODUCTS); // Fallback
-      return;
-    }
-    
-    if (data && data.length > 0) {
-      setProducts(data as Product[]);
-    } else {
-      setProducts(PRODUCTS);
+    try {
+      const { data, error } = await supabase.from('products').select('*');
+      if (error) {
+        console.error('Error fetching products:', error.message);
+        setProducts(PRODUCTS); // Fallback
+        return;
+      }
+      
+      if (data && data.length > 0) {
+        setProducts(data as Product[]);
+      } else {
+        setProducts(PRODUCTS);
+      }
+    } catch (e) {
+      console.error('Failed to fetch products:', e);
+      setProducts(PRODUCTS); // Fallback on network error
     }
   };
 
@@ -176,68 +193,69 @@ const App: React.FC = () => {
   };
 
   const handleOrderSubmitted = async (order: OrderData) => {
-    // Rate limit order creation to 5 per 10 minutes per client
-    const limit = isRateLimited('order_creation', 5, 600000);
-    if (limit.limited) {
-      alert(`Rate limit exceeded. Please wait ${limit.retryAfter} seconds before placing another order.`);
-      return;
+    try {
+      // Rate limit order creation to 5 per 10 minutes per client
+      const limit = isRateLimited('order_creation', 5, 600000);
+      if (limit.limited) {
+        alert(`Rate limit exceeded. Please wait ${limit.retryAfter} seconds before placing another order.`);
+        return;
+      }
+
+      const { error } = await supabase.from('orders').insert([order]);
+
+      if (error) {
+        alert('Failed to place order. Please try again.');
+        console.error(error);
+        return;
+      }
+
+      localStorage.setItem('lastOrder', JSON.stringify(order));
+      setActiveOrder(order);
+      setCurrentView('TRACKING');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      fetchOrders();
+    } catch (e) {
+      console.error('Order submission failed:', e);
+      alert('Network error. Please try again later.');
     }
-
-    const { error } = await supabase.from('orders').insert([order]);
-
-    if (error) {
-      alert('Failed to place order. Please try again.');
-      console.error(error);
-      return;
-    }
-
-    localStorage.setItem('lastOrder', JSON.stringify(order));
-    setActiveOrder(order);
-    setCurrentView('TRACKING');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    fetchOrders();
   };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setAuthError('');
 
-    // Rate limit login attempts removed for testing
-    /*
-    const limit = isRateLimited('login_attempts', 20, 60000);
-    if (limit.limited) {
-      setAuthError(`Too many login attempts. Retry in ${limit.retryAfter}s.`);
-      return;
-    }
-    */
+    try {
+      const emailInput = sanitizeInput(authEmail);
+      const passInput = authPass;
 
-    const emailInput = sanitizeInput(authEmail);
-    const passInput = authPass;
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: emailInput,
+        password: passInput,
+      });
 
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: emailInput,
-      password: passInput,
-    });
+      if (error) {
+        setAuthError(error.message);
+      } else if (data.user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', data.user.id)
+          .single();
 
-    if (error) {
-      setAuthError(error.message);
-    } else if (data.user) {
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', data.user.id)
-        .single();
-
-      const user: User = {
-        id: data.user.id,
-        email: data.user.email || '',
-        username: profile?.username || data.user.user_metadata.username || '',
-        name: profile?.name || data.user.user_metadata.name || '',
-        role: profile?.role || data.user.user_metadata.role || 'user',
-      };
-      setCurrentUser(user);
-      if (user.role === 'admin') setCurrentView('ADMIN_PANEL');
-      else setCurrentView('HOME');
+        const user: User = {
+          id: data.user.id,
+          email: data.user.email || '',
+          username: profile?.username || data.user.user_metadata.username || '',
+          name: profile?.name || data.user.user_metadata.name || '',
+          role: profile?.role || data.user.user_metadata.role || 'user',
+        };
+        setCurrentUser(user);
+        if (user.role === 'admin') setCurrentView('ADMIN_PANEL');
+        else setCurrentView('HOME');
+      }
+    } catch (e) {
+      console.error('Login failed:', e);
+      setAuthError('Network error. Please check your connection.');
     }
   };
 
@@ -245,48 +263,48 @@ const App: React.FC = () => {
     e.preventDefault();
     setAuthError('');
 
-    // Rate limit signup removed for testing
-    /*
-    const limit = isRateLimited('signup_attempts', 20, 60000);
-    if (limit.limited) {
-      setAuthError(`Rate limit reached. Retry in ${limit.retryAfter}s.`);
-      return;
-    }
-    */
+    try {
+      const sanitizedEmail = sanitizeInput(authEmail);
+      const sanitizedUser = sanitizeInput(authUsername, 20);
+      const sanitizedName = sanitizeInput(authName, 50);
 
-    const sanitizedEmail = sanitizeInput(authEmail);
-    const sanitizedUser = sanitizeInput(authUsername, 20);
-    const sanitizedName = sanitizeInput(authName, 50);
-
-    const { data, error } = await supabase.auth.signUp({
-      email: sanitizedEmail,
-      password: authPass,
-      options: {
-        data: {
-          username: sanitizedUser,
-          name: sanitizedName,
-          role: 'user', // Default role
+      const { data, error } = await supabase.auth.signUp({
+        email: sanitizedEmail,
+        password: authPass,
+        options: {
+          data: {
+            username: sanitizedUser,
+            name: sanitizedName,
+            role: 'user', // Default role
+          }
         }
-      }
-    });
+      });
 
-    if (error) {
-      setAuthError(error.message);
-    } else if (data.user) {
-      const user: User = {
-        id: data.user.id,
-        email: data.user.email || '',
-        username: data.user.user_metadata.username || '',
-        name: data.user.user_metadata.name || '',
-        role: data.user.user_metadata.role || 'user',
-      };
-      setCurrentUser(user);
-      setCurrentView('HOME');
+      if (error) {
+        setAuthError(error.message);
+      } else if (data.user) {
+        const user: User = {
+          id: data.user.id,
+          email: data.user.email || '',
+          username: data.user.user_metadata.username || '',
+          name: data.user.user_metadata.name || '',
+          role: data.user.user_metadata.role || 'user',
+        };
+        setCurrentUser(user);
+        setCurrentView('HOME');
+      }
+    } catch (e) {
+      console.error('Signup failed:', e);
+      setAuthError('Network error. Please check your connection.');
     }
   };
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    try {
+      await supabase.auth.signOut();
+    } catch (e) {
+      console.error('Logout failed:', e);
+    }
     setCurrentUser(null);
     setCurrentView('HOME');
   };
@@ -295,56 +313,74 @@ const App: React.FC = () => {
     e.preventDefault();
     setSearchError('');
     
-    const inputId = sanitizeInput(searchId).toUpperCase();
-    
-    const { data, error } = await supabase
-      .from('orders')
-      .select('*')
-      .eq('id', inputId)
-      .single();
-    
-    if (!error && data) {
-      setActiveOrder(data as OrderData);
-      setCurrentView('TRACKING');
-    } else {
-      setSearchError('Order ID not found.');
+    try {
+      const inputId = sanitizeInput(searchId).toUpperCase();
+      
+      const { data, error } = await supabase
+        .from('orders')
+        .select('*')
+        .eq('id', inputId)
+        .single();
+      
+      if (!error && data) {
+        setActiveOrder(data as OrderData);
+        setCurrentView('TRACKING');
+      } else {
+        setSearchError('Order ID not found.');
+      }
+    } catch (e) {
+      console.error('Tracking search failed:', e);
+      setSearchError('Network error. Please try again.');
     }
   };
 
   const updateOrderStatus = async (id: string, newStatus: OrderStatus) => {
-    const { error } = await supabase
-      .from('orders')
-      .update({ status: newStatus })
-      .eq('id', id);
+    try {
+      const { error } = await supabase
+        .from('orders')
+        .update({ status: newStatus })
+        .eq('id', id);
 
-    if (!error) {
-      fetchOrders();
+      if (!error) {
+        fetchOrders();
+      }
+    } catch (e) {
+      console.error('Update status failed:', e);
     }
   };
 
   const updateUserRole = async (userId: string, newRole: 'user' | 'admin') => {
-    const { error } = await supabase
-      .from('profiles')
-      .update({ role: newRole })
-      .eq('id', userId);
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ role: newRole })
+        .eq('id', userId);
 
-    if (!error) {
-      fetchUsers();
+      if (!error) {
+        fetchUsers();
+      }
+    } catch (e) {
+      console.error('Update role failed:', e);
     }
   };
 
   const deleteUser = async (userId: string) => {
     if (!window.confirm('Are you sure you want to delete this user? This will also delete all their orders.')) return;
     
-    // Supabase Auth deletion usually requires admin privileges via service role
-    // For this demo, we'll delete the profile and orders which are linked by cascade
-    const { error } = await supabase.from('profiles').delete().eq('id', userId);
-    
-    if (!error) {
-      fetchUsers();
-      fetchOrders();
-    } else {
-      alert('Failed to delete user profile: ' + error.message);
+    try {
+      // Supabase Auth deletion usually requires admin privileges via service role
+      // For this demo, we'll delete the profile and orders which are linked by cascade
+      const { error } = await supabase.from('profiles').delete().eq('id', userId);
+      
+      if (!error) {
+        fetchUsers();
+        fetchOrders();
+      } else {
+        alert('Failed to delete user profile: ' + error.message);
+      }
+    } catch (e) {
+      console.error('Delete user failed:', e);
+      alert('Network error. Please try again.');
     }
   };
 
@@ -393,7 +429,7 @@ const App: React.FC = () => {
               {/* Background Sea Image */}
               <div className="absolute inset-0 z-0">
                 <img 
-                  src="https://images.unsplash.com/photo-1505118380757-91f5f5632de0?auto=format&fit=crop&q=80&w=2000" 
+                  src="https://picsum.photos/seed/deepsea/1920/1080?blur=2" 
                   alt="Deep Sea" 
                   className="w-full h-full object-cover"
                   referrerPolicy="no-referrer"

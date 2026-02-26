@@ -24,7 +24,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onOrder }) => {
           onLoad={() => setImgLoaded(true)}
           onError={(e) => {
             setImgLoaded(true);
-            (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1548919973-5cdf5916ad52?auto=format&fit=crop&q=80&w=800';
+            (e.target as HTMLImageElement).src = 'https://picsum.photos/seed/waterfallback/800/800';
           }}
           className={`w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
         />
