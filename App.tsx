@@ -525,16 +525,6 @@ const App: React.FC = () => {
               <span className="serif italic font-light lowercase tracking-normal text-black/40">Back.</span>
             </h2>
             
-            <div className="mb-12 p-8 bg-stone-100 border border-black/5">
-               <p className="display text-[10px] text-black/40 font-bold mb-4 uppercase tracking-[0.2em]">Quick Access</p>
-               <button 
-                 onClick={() => { setAuthEmail('admin@admin.com'); setAuthPass('admin123456'); }}
-                 className="display w-full text-[11px] font-bold text-black bg-white border border-black/10 py-4 uppercase tracking-[0.2em] hover:bg-black hover:text-white transition-all"
-               >
-                 Use Admin Credentials
-               </button>
-            </div>
-
             <form onSubmit={handleLogin} className="space-y-12">
               <div className="space-y-8">
                 <div className="border-b border-black/10 pb-2">
