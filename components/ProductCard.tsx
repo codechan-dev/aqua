@@ -10,72 +10,71 @@ interface ProductCardProps {
 const ProductCard: React.FC<ProductCardProps> = ({ product, onOrder }) => {
   const [quantity, setQuantity] = useState(1);
   const [imgLoaded, setImgLoaded] = useState(false);
-  const [imgError, setImgError] = useState(false);
 
   return (
-    <div className="bg-white rounded-[12px] border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 group flex flex-col h-full">
-      <div className="relative aspect-video sm:h-56 bg-slate-50 flex items-center justify-center overflow-hidden">
-        {!imgLoaded && !imgError && (
-          <div className="absolute inset-0 bg-blue-50 animate-pulse flex items-center justify-center">
-             <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-          </div>
+    <div className="luxury-card group flex flex-col h-full bg-white border border-black/5">
+      <div className="relative aspect-[4/5] bg-stone-100 overflow-hidden">
+        {!imgLoaded && (
+          <div className="absolute inset-0 bg-stone-200 animate-pulse" />
         )}
-        
         <img 
           src={product.image} 
           alt={product.name} 
           referrerPolicy="no-referrer"
           onLoad={() => setImgLoaded(true)}
           onError={(e) => {
-            if (!imgError) {
-              setImgError(true);
-              (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1548919973-5cdf5916ad52?auto=format&fit=crop&q=80&w=600';
-            }
+            setImgLoaded(true);
+            (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1548919973-5cdf5916ad52?auto=format&fit=crop&q=80&w=800';
           }}
-          className={`w-full h-full object-contain p-4 transition-transform duration-500 group-hover:scale-105 ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
+          className={`w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
         />
-        
-        <div className="absolute top-3 right-3 bg-blue-600 text-white px-3 py-1 rounded-[12px] text-[10px] font-bold uppercase tracking-wider shadow-sm">
-          In Stock
+        <div className="absolute bottom-0 left-0 w-full p-6 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+           <p className="text-white text-[10px] uppercase tracking-[0.2em] font-bold">Premium Selection</p>
         </div>
       </div>
       
-      <div className="p-5 flex flex-col flex-grow">
-        <h3 className="text-xl font-bold text-slate-800 mb-2 leading-tight">{product.name}</h3>
-        <p className="text-slate-500 text-xs mb-4 flex-grow line-clamp-2">{product.description}</p>
+      <div className="p-8 flex flex-col flex-grow">
+        <div className="flex justify-between items-start mb-4">
+          <h3 className="display text-2xl font-bold text-black leading-tight tracking-tight uppercase">{product.name}</h3>
+          <span className="display text-xl font-light text-black/40">0{product.id.replace('p', '')}</span>
+        </div>
         
-        <div className="flex items-center justify-between mb-5">
+        <p className="serif text-lg text-black/60 mb-8 flex-grow leading-relaxed italic">{product.description}</p>
+        
+        <div className="flex items-end justify-between pt-6 border-t border-black/5">
           <div className="flex flex-col">
-             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Price</span>
-             <span className="text-2xl font-bold text-blue-600">₹{product.price}</span>
+             <span className="text-[10px] font-bold text-black/30 uppercase tracking-[0.2em] mb-1">Investment</span>
+             <span className="display text-3xl font-bold text-black">₹{product.price}</span>
           </div>
           
-          <div className="flex items-center bg-slate-100 p-1 rounded-[12px] border border-slate-200">
+          <div className="flex flex-col items-end space-y-4">
+            <div className="flex items-center space-x-4 border-b border-black/10 pb-1">
+              <button 
+                onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                className="text-black/40 hover:text-black transition-colors text-lg"
+              >
+                —
+              </button>
+              <span className="display font-bold text-sm w-4 text-center">{quantity}</span>
+              <button 
+                onClick={() => setQuantity(quantity + 1)}
+                className="text-black/40 hover:text-black transition-colors text-lg"
+              >
+                +
+              </button>
+            </div>
+            
             <button 
-              onClick={() => setQuantity(Math.max(1, quantity - 1))}
-              className="w-8 h-8 flex items-center justify-center bg-white rounded-[8px] text-slate-800 font-bold shadow-sm active:scale-90 hover:bg-blue-50 transition-all"
+              onClick={() => onOrder(product, quantity)}
+              className="display text-[11px] font-bold uppercase tracking-[0.3em] text-black hover:text-blue-600 transition-colors flex items-center space-x-2"
             >
-              -
-            </button>
-            <span className="w-8 text-center text-slate-800 font-bold text-sm">{quantity}</span>
-            <button 
-              onClick={() => setQuantity(quantity + 1)}
-              className="w-8 h-8 flex items-center justify-center bg-white rounded-[8px] text-slate-800 font-bold shadow-sm active:scale-90 hover:bg-blue-50 transition-all"
-            >
-              +
+              <span>Initiate Order</span>
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
             </button>
           </div>
         </div>
-
-        <button 
-          onClick={() => onOrder(product, quantity)}
-          className="w-full bg-blue-600 text-white py-3 rounded-[12px] font-bold text-sm hover:bg-blue-700 transition-all active:scale-95 flex items-center justify-center space-x-2 shadow-sm"
-        >
-          <span>Order Now</span>
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-          </svg>
-        </button>
       </div>
     </div>
   );

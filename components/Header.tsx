@@ -10,69 +10,49 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ setView, currentUser, onLogout }) => {
   return (
-    <header className="sticky top-0 z-50 bg-white border-b border-slate-200 shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16 sm:h-20">
+    <header className="sticky top-0 z-50 bg-stone-50/80 backdrop-blur-md border-b border-black/5">
+      <div className="max-w-7xl mx-auto px-6 sm:px-12">
+        <div className="flex justify-between items-center h-24 sm:h-32">
           <div 
             className="flex items-center cursor-pointer group"
             onClick={() => setView('HOME')}
           >
-            <div className="w-10 h-10 bg-blue-600 rounded-[12px] flex items-center justify-center mr-3 transition-transform group-hover:scale-110 shadow-md">
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
-              </svg>
-            </div>
-            <div>
-              <span className="text-lg font-bold text-slate-800 tracking-tight block leading-tight">AquaFlow</span>
-              <span className="text-[10px] font-bold text-blue-600 uppercase tracking-widest hidden sm:block">Chennai Delivery</span>
+            <div className="flex flex-col">
+              <span className="display text-2xl font-bold text-black tracking-tighter uppercase leading-none">AquaFlow</span>
+              <span className="display text-[9px] font-bold text-black/40 uppercase tracking-[0.4em] mt-1">Chennai • Purity</span>
             </div>
           </div>
           
-          <nav className="hidden md:flex items-center space-x-2">
-            <button onClick={() => setView('HOME')} className="px-4 py-2 rounded-[12px] text-slate-600 hover:text-blue-600 hover:bg-blue-50 font-medium transition-all">Home</button>
-            <button onClick={() => setView('SEARCH')} className="px-4 py-2 rounded-[12px] text-slate-600 hover:text-blue-600 hover:bg-blue-50 font-medium transition-all">Track</button>
+          <nav className="hidden md:flex items-center space-x-12">
+            <button onClick={() => setView('HOME')} className="display text-[11px] font-bold uppercase tracking-[0.2em] text-black/60 hover:text-black transition-colors">Home</button>
+            <button onClick={() => setView('SEARCH')} className="display text-[11px] font-bold uppercase tracking-[0.2em] text-black/60 hover:text-black transition-colors">Track</button>
             {currentUser && (
-              <button onClick={() => setView('CLIENT_DASHBOARD')} className="px-4 py-2 rounded-[12px] text-slate-600 hover:text-blue-600 hover:bg-blue-50 font-medium transition-all">My Profile</button>
+              <button onClick={() => setView('CLIENT_DASHBOARD')} className="display text-[11px] font-bold uppercase tracking-[0.2em] text-black/60 hover:text-black transition-colors">Profile</button>
             )}
             {currentUser?.role === 'admin' && (
-              <button onClick={() => setView('ADMIN_PANEL')} className="px-4 py-2 rounded-[12px] text-blue-700 bg-blue-50 font-bold transition-all ml-2">Admin Hub</button>
+              <button onClick={() => setView('ADMIN_PANEL')} className="display text-[11px] font-bold uppercase tracking-[0.2em] text-blue-600">Admin Hub</button>
             )}
           </nav>
 
-          <div className="flex items-center space-x-2">
-            {!currentUser && (
-              <button 
-                onClick={() => setView('LOGIN')}
-                className="text-[10px] font-bold text-slate-400 hover:text-blue-600 transition-all mr-4 uppercase tracking-[0.2em] hidden lg:block"
-              >
-                Admin Portal
-              </button>
-            )}
-            
+          <div className="flex items-center space-x-8">
             {currentUser ? (
-              <div className="flex items-center space-x-2">
-                <div className="text-right hidden sm:block px-2">
-                  <p className="text-sm font-bold text-slate-900 leading-none">{currentUser.name}</p>
-                </div>
+              <div className="flex items-center space-x-6">
+                <span className="display text-[11px] font-bold uppercase tracking-[0.1em] text-black/40 hidden sm:block">{currentUser.name}</span>
                 <button 
                   onClick={onLogout}
-                  className="bg-slate-100 text-slate-500 p-2 rounded-[12px] hover:text-red-600 transition-all hover:bg-red-50"
-                  title="Logout"
+                  className="text-black/40 hover:text-red-600 transition-colors"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                   </svg>
                 </button>
               </div>
             ) : (
               <button 
                 onClick={() => setView('LOGIN')}
-                className="bg-blue-600 text-white px-5 py-2.5 rounded-[12px] font-bold hover:bg-blue-700 transition-all shadow-sm active:scale-95 flex items-center space-x-2 text-sm sm:text-base"
+                className="display text-[11px] font-bold uppercase tracking-[0.2em] text-black border-b border-black/20 pb-1 hover:border-black transition-all"
               >
-                <span>Login</span>
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                </svg>
+                Sign In
               </button>
             )}
           </div>

@@ -12,59 +12,61 @@ interface ClientDashboardProps {
 
 const ClientDashboard: React.FC<ClientDashboardProps> = ({ orders, products, onTrackOrder, setView }) => {
   return (
-    <div className="max-w-5xl mx-auto py-10 sm:py-16 px-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-10 gap-4">
+    <div className="max-w-5xl mx-auto py-24 px-6 animate-in fade-in duration-1000">
+      <div className="flex flex-col md:flex-row justify-between items-end mb-24 gap-8">
         <div>
-          <span className="text-[10px] font-bold text-blue-600 uppercase tracking-widest">Customer Center</span>
-          <h2 className="text-3xl font-bold text-slate-900 mt-1">Order History</h2>
+          <div className="display text-[10px] font-bold uppercase tracking-[0.4em] text-black/40 mb-8">Customer Dashboard</div>
+          <h2 className="display text-5xl font-bold text-black tracking-tighter uppercase mb-4 leading-none">
+            Order <br/>
+            <span className="serif italic font-light lowercase tracking-normal text-black/40">History.</span>
+          </h2>
         </div>
         <button 
           onClick={() => setView('HOME')}
-          className="w-full sm:w-auto bg-blue-600 text-white px-6 py-3 rounded-[12px] font-bold text-sm shadow-sm hover:bg-blue-700 transition-all"
+          className="display text-[11px] font-bold uppercase tracking-[0.3em] text-black border-b-2 border-black pb-2 hover:text-blue-600 hover:border-blue-600 transition-all"
         >
-          Book Delivery
+          New Request
         </button>
       </div>
 
       {orders.length === 0 ? (
-        <div className="bg-white rounded-[12px] p-16 text-center border border-slate-200">
-           <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-6 text-2xl">💧</div>
-           <p className="text-lg font-bold text-slate-800">You haven't placed any orders yet.</p>
-           <button onClick={() => setView('HOME')} className="text-blue-600 font-bold mt-3 hover:underline">Start your first order</button>
+        <div className="py-32 text-center border border-black/5 bg-stone-50">
+           <p className="serif text-2xl italic text-black/40 mb-8">Your history is currently empty.</p>
+           <button onClick={() => setView('HOME')} className="display text-[11px] font-bold uppercase tracking-[0.3em] text-black underline underline-offset-8 hover:text-blue-600 transition-colors">Begin your journey</button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
           {orders.map(order => {
             const product = products.find(p => p.id === order.productId);
             return (
-              <div key={order.id} className="bg-white rounded-[12px] p-6 border border-slate-200 shadow-sm hover:shadow-md transition-all group">
-                <div className="flex justify-between items-start mb-4">
+              <div key={order.id} className="p-10 border border-black/5 bg-white hover:shadow-2xl hover:shadow-black/5 transition-all group">
+                <div className="flex justify-between items-start mb-12">
                   <div>
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{order.id}</span>
-                    <h3 className="text-lg font-bold text-slate-800 mt-1">{product?.name}</h3>
+                    <span className="display text-[10px] font-bold text-black/30 uppercase tracking-[0.2em]">{order.id}</span>
+                    <h3 className="display text-lg font-bold uppercase tracking-[0.1em] mt-2">{product?.name}</h3>
                   </div>
-                  <span className={`px-2 py-1 rounded-[6px] text-[9px] font-bold uppercase tracking-wider ${
-                    order.status === 'Delivered' ? 'bg-green-50 text-green-600' : 'bg-blue-50 text-blue-600'
+                  <span className={`display text-[10px] font-bold uppercase tracking-[0.2em] px-4 py-2 border ${
+                    order.status === 'Delivered' ? 'border-black/10 text-black/40' : 'border-blue-600/20 text-blue-600'
                   }`}>
                     {order.status}
                   </span>
                 </div>
                 
-                <div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-50">
-                   <div className="flex flex-col">
-                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Cans</span>
-                      <span className="text-lg font-bold text-slate-900">{order.quantity}</span>
+                <div className="grid grid-cols-2 gap-8 mb-12 pb-8 border-b border-black/5">
+                   <div>
+                      <span className="display text-[10px] font-bold text-black/30 uppercase tracking-[0.2em]">Quantity</span>
+                      <p className="display text-2xl font-bold mt-2">{order.quantity}</p>
                    </div>
                    <div className="text-right">
-                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Paid</span>
-                      <span className="text-lg font-bold text-blue-600">₹{(product?.price || 0) * order.quantity}</span>
+                      <span className="display text-[10px] font-bold text-black/30 uppercase tracking-[0.2em]">Total</span>
+                      <p className="display text-2xl font-bold mt-2">₹{(product?.price || 0) * order.quantity}</p>
                    </div>
                 </div>
 
-                <div className="flex gap-3">
+                <div className="flex space-x-8">
                   <button 
                     onClick={() => onTrackOrder(order)}
-                    className="flex-1 bg-slate-100 text-slate-700 py-2.5 rounded-[12px] font-bold text-xs hover:bg-slate-200 transition-all"
+                    className="display text-[11px] font-bold uppercase tracking-[0.3em] text-black border-b-2 border-black pb-2 hover:text-blue-600 hover:border-blue-600 transition-all"
                   >
                     Track
                   </button>
@@ -73,7 +75,7 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ orders, products, onT
                       onTrackOrder(order);
                       setView('BILL');
                     }}
-                    className="flex-1 bg-blue-50 text-blue-700 py-2.5 rounded-[12px] font-bold text-xs hover:bg-blue-100 transition-all"
+                    className="display text-[11px] font-bold uppercase tracking-[0.3em] text-black/40 hover:text-black transition-colors"
                   >
                     Invoice
                   </button>

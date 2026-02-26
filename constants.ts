@@ -4,24 +4,24 @@ import { Product } from './types';
 export const PRODUCTS: Product[] = [
   {
     id: 'p1',
-    name: '20L Standard Water',
+    name: 'Standard 25L Purity',
     price: 35,
-    image: 'https://images.unsplash.com/photo-1548919973-5cdf5916ad52?auto=format&fit=crop&q=80&w=600',
-    description: 'Purified and mineral enriched 20 litre water can. Perfect for daily household needs.'
+    image: 'https://images.unsplash.com/photo-1559839914-17aae19cea9e?auto=format&fit=crop&q=80&w=800',
+    description: 'Our signature 25-liter container, designed for the modern home. Purified through dual-stage filtration for consistent quality.'
   },
   {
     id: 'p2',
-    name: '20L RO Purified Water',
+    name: 'Advanced 25L RO+',
     price: 45,
-    image: 'https://images.unsplash.com/photo-1626509653293-3532c589069d?auto=format&fit=crop&q=80&w=600',
-    description: 'Advanced Reverse Osmosis treated ultra-pure drinking water for the health-conscious.'
+    image: 'https://images.unsplash.com/photo-1581244277943-fe4a9c777189?auto=format&fit=crop&q=80&w=800',
+    description: '25 liters of ultra-pure water. Reverse Osmosis combined with UV treatment ensures the highest level of safety for your family.'
   },
   {
     id: 'p3',
-    name: '20L Himalayan Spring',
+    name: 'Himalayan 25L Spring',
     price: 60,
-    image: 'https://images.unsplash.com/photo-1616118132284-9344445c7110?auto=format&fit=crop&q=80&w=600',
-    description: 'Premium natural mineral water sourced from pristine high-altitude springs.'
+    image: 'https://images.unsplash.com/photo-1548919973-5cdf5916ad52?auto=format&fit=crop&q=80&w=800',
+    description: 'Sourced from pristine high-altitude springs. Naturally mineralized 25L delivery for an unparalleled hydration experience.'
   }
 ];
 
